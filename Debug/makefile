@@ -61,8 +61,8 @@ all: main-build
 main-build: myOS.elf secondary-outputs
 
 # Tool invocations
-myOS.elf myOS.map: $(OBJS) $(USER_OBJS) C:\Users\Lucas\Desktop\ISO\ 1\myOS\STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "myOS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Lucas\Desktop\ISO 1\myOS\STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="myOS.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+myOS.elf myOS.map: $(OBJS) $(USER_OBJS) C:\Users\Lucas\Desktop\Repos\constantino-iso1\STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "myOS.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Lucas\Desktop\Repos\constantino-iso1\STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="myOS.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

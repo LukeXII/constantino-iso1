@@ -11,10 +11,10 @@
 #include "osCore.h"
 
 typedef struct{
-	osStatus_t execStatus;                		// OS execution status (Reset, Running, IRQ)
+	osStatus_t execStatus;                			// OS execution status (Reset, Running, IRQ)
     uint32_t osScheduleExec;                    	// Execution flag
-    osTaskObject_t * ptrCurrTask;			// Current task executing
-    osTaskObject_t * ptrNextTask;        	// Next task to be executed
+    osTaskObject_t * ptrCurrTask;					// Current task executing
+    osTaskObject_t * ptrNextTask;        			// Next task to be executed
     osTaskObject_t * ptrTaskList[OS_MAX_TASKS];   	// List of tasks
     uint8_t tasksCounter;
 } osCoreCtrl_t;
@@ -31,6 +31,14 @@ static void scheduler(void);
 
 osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, void * ptrTaskCallback)
 {
+
+    // Check that arguments are not NULL
+    if ( (ptrTaskHandler == NULL) || (ptrTaskCallback == NULL) )
+    {
+    	return OS_ERR_INVALID_PTR;
+    }
+
+    // Check if there's available tasks to allocate
     if (osCore.tasksCounter >= OS_MAX_TASKS)
     {
         return OS_ERR_MAX_TASKS;
@@ -38,14 +46,30 @@ osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, void * ptrTaskCallback)
 
     /*
         Arrange the STACK Frame for the first time:
-        1) Set a 1 on bit 24 of xPSR to make sure we are executing THUMB instructions.
-        2) PC must have the entry point (taskFunction in this case).
-        3) Set the link register to EXEC_RETURN_VALUE to trigger.
+        1) Set bit 24 of xPSR to make sure we are executing THUMB instructions
+        2) PC must contain the task entry point (ptrTaskCallback)
+        3) Set the link register to EXEC_RETURN_VALUE to trigger
     */
     ptrTaskHandler->taskStack[OS_MAX_STACK_SIZE/4 - XPSR_REG_POSITION]      = XPSR_VALUE;
     ptrTaskHandler->taskStack[OS_MAX_STACK_SIZE/4 - PC_REG_POSITION]        = (uint32_t)ptrTaskCallback;
     ptrTaskHandler->taskStack[OS_MAX_STACK_SIZE/4 - LR_PREV_VALUE_POSITION] = EXEC_RETURN_VALUE;
 
+
+    ptrTaskHandler->taskStackPointer = (uint32_t)(ptrTaskHandler->taskStack + OS_MAX_STACK_SIZE/4 - OS_STACK_FRAME_SIZE);
+    ptrTaskHandler->ptrTaskEntryPoint = ptrTaskCallback;
+    ptrTaskHandler->taskExecStatus = OS_TASK_READY;
+    ptrTaskHandler->taskID = osCore.tasksCounter;
+
+    // Fill controls OS structure
+    osCore.ptrTaskList[osCore.tasksCounter] = ptrTaskHandler;
+    osCore.tasksCounter++;
+
+    if (osCore.tasksCounter < OS_MAX_TASKS)
+	{
+    	osCore.ptrTaskList[osCore.tasksCounter] = NULL;
+	}
+
+    return OS_OK;
 }
 
 
@@ -56,8 +80,8 @@ void osStart(void)
     NVIC_DisableIRQ(PendSV_IRQn);
 
     osCore.execStatus = OS_STATUS_RESET;		// Set the system to RESET for the first time
-    osCore.ptrCurrTask = NULL;      	// Set the current task to NULL the first time
-    osCore.ptrNextTask = NULL;      	// Set the next task to NULL the first time
+    osCore.ptrCurrTask = NULL;      			// Set the current task to NULL the first time
+    osCore.ptrNextTask = NULL;      			// Set the next task to NULL the first time
 
     // Is mandatory to set the PendSV priority as lowest as possible */
     NVIC_SetPriority(PendSV_IRQn, (1 << __NVIC_PRIO_BITS)-1);
@@ -95,7 +119,23 @@ static uint32_t getNextContext(uint32_t currentStackPointer)
 
 static void scheduler(void)
 {
+	uint8_t index = 0;
 
+    // Check if this is the first scheduler execution
+    if (osCore.execStatus != OS_STATUS_RUNNING)
+    {
+    	osCore.ptrCurrTask = osCore.ptrTaskList[0];				// If the OS wasn't running load the first task to be run
+    }
+    else
+    {
+    	index = osCore.ptrCurrTask->taskID + 1;					// Computes next task id to be run
+
+    	osCore.ptrNextTask = osCore.ptrTaskList[index];			// Load next task to be run
+
+    	// Check if this is the last task to be run. If so, reset index for next scheduler execution
+        if ( (index >= OS_MAX_TASKS) || (osCore.ptrNextTask == NULL) )
+            index = 0;
+    }
 }
 
 /* ========== Processor Interruption and Exception Handlers ========= */

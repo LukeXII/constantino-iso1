@@ -50,13 +50,16 @@
 /*                                   Types                                   */
 /* ************************************************************************* */
 
-typedef enum{
+typedef enum
+{
     OS_OK,
-    OS_ERR_MAX_TASKS
+	OS_ERR_MAX_TASKS,
+	OS_ERR_INVALID_PTR
 } osError_t;
 
 // OS status
-typedef enum{
+typedef enum
+{
     OS_STATUS_RUNNING,
     OS_STATUS_RESET
 } osStatus_t;
@@ -71,13 +74,14 @@ typedef enum
 } osTaskStatus_t;
 
 // Task control structure
-typedef struct{
+typedef struct
+{
     uint32_t taskStack[OS_MAX_STACK_SIZE/4];    	// Memory Size
     uint32_t taskStackPointer;                   	// Store the task SP
     void * ptrTaskEntryPoint;                   	// Task entry point address
     osTaskStatus_t taskExecStatus;   				// Task current execution status
     uint8_t taskID;                             	// Task ID
-    char * ptrTaskName[OS_MAX_TASK_NAME_CHAR];  	// Task name in string for debug purposes
+    char * ptrTaskName[OS_MAX_TASK_NAME_CHAR];  	// Task name (for debug purposes)
 } osTaskObject_t;
 
 /* ************************************************************************* */

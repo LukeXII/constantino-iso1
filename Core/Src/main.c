@@ -53,6 +53,10 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
+osTaskObject_t osTask1;
+osTaskObject_t osTask2;
+osTaskObject_t osTask3;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -63,6 +67,11 @@ static void MX_GPIO_Init(void);
 static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
+
+static void task1(void);
+static void task2(void);
+static void task3(void);
+
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -105,7 +114,11 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
 
+  osTaskCreate(&osTask1, task1);
+  osTaskCreate(&osTask2, task2);
+  osTaskCreate(&osTask3, task3);
 
+  osStart();
 
   /* USER CODE END 2 */
 
@@ -118,6 +131,36 @@ int main(void)
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+}
+
+static void task1(void)
+{
+    uint32_t i = 0;
+
+    while(1)
+    {
+        i++;
+    }
+}
+
+static void task2(void)
+{
+    uint32_t j = 0;
+
+    while(1)
+    {
+        j++;
+    }
+}
+
+static void task3(void)
+{
+    uint32_t k = 0;
+
+    while(1)
+    {
+        k++;
+    }
 }
 
 /**

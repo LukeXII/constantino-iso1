@@ -2,9 +2,9 @@
 ../Drivers/CMSIS/Include/core_cm4.h:1724:22:__NVIC_DisableIRQ	2
 ../Drivers/CMSIS/Include/core_cm4.h:1816:22:__NVIC_SetPriority	2
 ../Drivers/CMSIS/Include/core_cm4.h:2022:26:SysTick_Config	2
-../OS/src/osCore.c:32:11:osTaskCreate	2
-../OS/src/osCore.c:52:6:osStart	1
-../OS/src/osCore.c:75:17:getNextContext	2
-../OS/src/osCore.c:96:13:scheduler	1
-../OS/src/osCore.c:103:6:SysTick_Handler	1
-../OS/src/osCore.c:125:30:PendSV_Handler	1
+../OS/src/osCore.c:32:11:osTaskCreate	5
+../OS/src/osCore.c:76:6:osStart	1
+../OS/src/osCore.c:99:17:getNextContext	2
+../OS/src/osCore.c:120:13:scheduler	4
+../OS/src/osCore.c:143:6:SysTick_Handler	1
+../OS/src/osCore.c:165:30:PendSV_Handler	1
