@@ -24,6 +24,7 @@
 #define OS_STACK_FRAME_SIZE 	17U
 #define SYSTICK_PERIOD_MS		1U          					// Systick period time ms
 #define OS_MAX_TASK_NAME_CHAR	10
+#define WEAK					__attribute__((weak))
 
 /* Registers positions on Stack Frame */
 #define XPSR_VALUE              1 << 24     // xPSR.T = 1
@@ -73,6 +74,15 @@ typedef enum
     OS_TASK_SUSPENDED
 } osTaskStatus_t;
 
+// Task priorities
+typedef enum
+{
+    TASK_PRIORITY_0,
+	TASK_PRIORITY_1,
+	TASK_PRIORITY_2,
+	TASK_PRIORITY_3
+} osTaskPriority_t;
+
 // Task control structure
 typedef struct
 {
@@ -82,14 +92,47 @@ typedef struct
     osTaskStatus_t taskExecStatus;   				// Task current execution status
     uint8_t taskID;                             	// Task ID
     char * ptrTaskName[OS_MAX_TASK_NAME_CHAR];  	// Task name (for debug purposes)
+    osTaskPriority_t taskPriority;					// Task assigned priority
 } osTaskObject_t;
 
 /* ************************************************************************* */
 /*                              Public Functions                             */
 /* ************************************************************************* */
 
-osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, void * ptrTaskCallback);
-
+osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, osTaskPriority_t taskPriority, void * ptrTaskCallback);
 void osStart(void);
+/**
+ * @brief Execute a delay for the current task.
+ *
+ * @param[in]   tick Number ticks delayed.
+ */
+void osDelay(const uint32_t tick);
+/**
+ * @brief Function used as default when some task return for a problem.
+ */
+void osReturnTaskHook(void);
+/**
+ * @brief Function used if user would like to do something on systick hander interrupt.
+ * It has a default implementation that do anything.
+ *
+ * @warning The function used to perform operations on each Systick in the system. It
+ * be as short as possible because it is called in the Systick interrupt handler.
+ *
+ * @warning The function shouldn't call an OS API in any case because a new scheduler
+ * could occur.
+ */
+void osSysTickHook(void);
+
+/**
+ * @brief Function used when happen error on OS
+ *
+ * @param[in]   caller  Function pointer where error happened.
+ */
+void osErrorHook(void* caller);
+
+/**
+ * @brief Idle task of the operation system.
+ */
+void osIdleTask(void);
 
 #endif /* INC_OSCORE_H_ */

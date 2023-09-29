@@ -17,6 +17,7 @@ typedef struct{
     osTaskObject_t * ptrNextTask;        			// Next task to be executed
     osTaskObject_t * ptrTaskList[OS_MAX_TASKS];   	// List of tasks
     uint8_t tasksCounter;
+    uint8_t taskPriorityTable[4][OS_MAX_TASKS];
 } osCoreCtrl_t;
 
 /* ================== Private variables declaration ================= */
@@ -29,7 +30,7 @@ static void scheduler(void);
 
 /* ================ Public functions implementation ================ */
 
-osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, void * ptrTaskCallback)
+osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, osTaskPriority_t taskPriority, void * ptrTaskCallback)
 {
 
     // Check that arguments are not NULL
@@ -58,11 +59,12 @@ osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, void * ptrTaskCallback)
     ptrTaskHandler->taskStackPointer = (uint32_t)(ptrTaskHandler->taskStack + OS_MAX_STACK_SIZE/4 - OS_STACK_FRAME_SIZE);
     ptrTaskHandler->ptrTaskEntryPoint = ptrTaskCallback;
     ptrTaskHandler->taskExecStatus = OS_TASK_READY;
+    osCore.tasksCounter++;
     ptrTaskHandler->taskID = osCore.tasksCounter;
+    ptrTaskHandler->taskPriority = taskPriority;
 
     // Fill controls OS structure
-    osCore.ptrTaskList[osCore.tasksCounter] = ptrTaskHandler;
-    osCore.tasksCounter++;
+    osCore.ptrTaskList[osCore.tasksCounter - 1] = ptrTaskHandler;
 
     if (osCore.tasksCounter < OS_MAX_TASKS)
 	{
@@ -94,6 +96,39 @@ void osStart(void)
     NVIC_EnableIRQ(PendSV_IRQn);
     NVIC_EnableIRQ(SysTick_IRQn);
 }
+
+void osDelay(const uint32_t tick)
+{
+    //(void)tick;
+}
+
+WEAK void osReturnTaskHook(void)
+{
+    while(1)
+    {
+        __WFI();
+    }
+}
+
+WEAK void osSysTickHook(void)
+{
+    __ASM volatile ("nop");
+}
+
+WEAK void osErrorHook(void* caller)
+{
+    while(1)
+    {
+    }
+}
+
+WEAK void osIdleTask(void)
+{
+    while(1)
+    {
+    }
+}
+
 /* ================ Private functions implementation ================ */
 
 static uint32_t getNextContext(uint32_t currentStackPointer)
@@ -105,7 +140,7 @@ static uint32_t getNextContext(uint32_t currentStackPointer)
     }
     else
     {
-        // Storage last stack pointer used on current task and change state to ready.
+        // Storage last stack pointer used on current task and change state to ready
         osCore.ptrCurrTask->taskStackPointer = currentStackPointer;
         osCore.ptrCurrTask->taskExecStatus = OS_TASK_READY;
 
@@ -128,13 +163,13 @@ static void scheduler(void)
     }
     else
     {
-    	index = osCore.ptrCurrTask->taskID + 1;					// Computes next task id to be run
-
-    	osCore.ptrNextTask = osCore.ptrTaskList[index];			// Load next task to be run
+    	index = osCore.ptrCurrTask->taskID;						// Computes next task id to be run
 
     	// Check if this is the last task to be run. If so, reset index for next scheduler execution
-        if ( (index >= OS_MAX_TASKS) || (osCore.ptrNextTask == NULL) )
-            index = 0;
+        if(index == osCore.tasksCounter)
+        	index = 0;
+
+        osCore.ptrNextTask = osCore.ptrTaskList[index];			// Load next task to be run
     }
 }
 
@@ -143,6 +178,7 @@ static void scheduler(void)
 void SysTick_Handler(void)
 {
     scheduler();
+    osSysTickHook();
 
     /*
      * Set up bit corresponding exception PendSV
