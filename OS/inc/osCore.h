@@ -110,7 +110,7 @@ void osDelay(const uint32_t tick);
 /**
  * @brief Function used as default when some task return for a problem.
  */
-void osReturnTaskHook(void);
+WEAK void osReturnTaskHook(void);
 /**
  * @brief Function used if user would like to do something on systick hander interrupt.
  * It has a default implementation that do anything.
@@ -121,18 +121,18 @@ void osReturnTaskHook(void);
  * @warning The function shouldn't call an OS API in any case because a new scheduler
  * could occur.
  */
-void osSysTickHook(void);
+WEAK void osSysTickHook(void);
 
 /**
  * @brief Function used when happen error on OS
  *
  * @param[in]   caller  Function pointer where error happened.
  */
-void osErrorHook(void* caller);
+WEAK void osErrorHook(void* caller);
 
 /**
  * @brief Idle task of the operation system.
  */
-void osIdleTask(void);
+WEAK void osIdleTask(void);
 
 #endif /* INC_OSCORE_H_ */

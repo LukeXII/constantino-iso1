@@ -48,6 +48,9 @@ UART_HandleTypeDef huart3;
 osTaskObject_t task1;
 osTaskObject_t task2;
 osTaskObject_t task3;
+osTaskObject_t task4;
+osTaskObject_t task5;
+osTaskObject_t task6;
 
 /* USER CODE BEGIN PV */
 
@@ -66,6 +69,9 @@ static void MX_USART3_UART_Init(void);
 void osTask1(void);
 void osTask2(void);
 void osTask3(void);
+void osTask4(void);
+void osTask5(void);
+void osTask6(void);
 /* USER CODE END 0 */
 
 /**
@@ -101,9 +107,17 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   osTaskCreate(&task1, TASK_PRIORITY_0, osTask1);
-  osTaskCreate(&task2, TASK_PRIORITY_0, osTask2);
-  osTaskCreate(&task3, TASK_PRIORITY_0, osTask3);
+  osTaskCreate(&task2, TASK_PRIORITY_1, osTask2);
+  osTaskCreate(&task3, TASK_PRIORITY_1, osTask3);
+  osTaskCreate(&task4, TASK_PRIORITY_0, osTask4);
+  osTaskCreate(&task5, TASK_PRIORITY_1, osTask5);
+  osTaskCreate(&task6, TASK_PRIORITY_2, osTask6);
 
+//  task1.taskExecStatus = OS_TASK_BLOCKED;
+//  task4.taskExecStatus = OS_TASK_BLOCKED;
+  task3.taskExecStatus = OS_TASK_BLOCKED;
+  task1.taskExecStatus = OS_TASK_BLOCKED;
+  task4.taskExecStatus = OS_TASK_BLOCKED;
   osStart();
 
   /* USER CODE END 2 */
@@ -139,6 +153,33 @@ void osTask2(void)
 }
 
 void osTask3(void)
+{
+  uint32_t k = 0;
+  while(1)
+  {
+    k++;
+  }
+}
+
+void osTask4(void)
+{
+  uint32_t k = 0;
+  while(1)
+  {
+    k++;
+  }
+}
+
+void osTask5(void)
+{
+  uint32_t k = 0;
+  while(1)
+  {
+    k++;
+  }
+}
+
+void osTask6(void)
 {
   uint32_t k = 0;
   while(1)

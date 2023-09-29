@@ -22,6 +22,7 @@ typedef struct{
 
 /* ================== Private variables declaration ================= */
 static osCoreCtrl_t osCore;
+static osTaskObject_t idleTask;
 
 /* ================== Private functions declaration ================= */
 
@@ -77,6 +78,8 @@ osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, osTaskPriority_t taskPri
 
 void osStart(void)
 {
+	uint8_t i, row, col;
+
 	// Disable Systick and PendSV interrupts
     NVIC_DisableIRQ(SysTick_IRQn);
     NVIC_DisableIRQ(PendSV_IRQn);
@@ -84,6 +87,41 @@ void osStart(void)
     osCore.execStatus = OS_STATUS_RESET;		// Set the system to RESET for the first time
     osCore.ptrCurrTask = NULL;      			// Set the current task to NULL the first time
     osCore.ptrNextTask = NULL;      			// Set the next task to NULL the first time
+
+    osTaskCreate(&idleTask, TASK_PRIORITY_3, osIdleTask);
+
+    for(i = 0; i < osCore.tasksCounter;i++)
+    {
+    	switch(osCore.ptrTaskList[i]->taskPriority)
+    	{
+    	case TASK_PRIORITY_0:
+
+    		row = 0;
+    		break;
+
+    	case TASK_PRIORITY_1:
+
+    		row = 1;
+    		break;
+
+    	case TASK_PRIORITY_2:
+
+    		row = 2;
+    		break;
+
+    	case TASK_PRIORITY_3:
+
+    		row = 3;
+    		break;
+    	}
+
+    	col = 0;
+    	while(osCore.taskPriorityTable[row][col] != 0)
+    		col++;
+
+    	osCore.taskPriorityTable[row][col] = osCore.ptrTaskList[i]->taskID;
+
+    }
 
     // Is mandatory to set the PendSV priority as lowest as possible */
     NVIC_SetPriority(PendSV_IRQn, (1 << __NVIC_PRIO_BITS)-1);
@@ -126,6 +164,7 @@ WEAK void osIdleTask(void)
 {
     while(1)
     {
+    	__WFI();
     }
 }
 
@@ -154,23 +193,55 @@ static uint32_t getNextContext(uint32_t currentStackPointer)
 
 static void scheduler(void)
 {
-	uint8_t index = 0;
+	uint8_t row, col, id;
 
     // Check if this is the first scheduler execution
     if (osCore.execStatus != OS_STATUS_RUNNING)
     {
-    	osCore.ptrCurrTask = osCore.ptrTaskList[0];				// If the OS wasn't running load the first task to be run
+    	osCore.ptrCurrTask = osCore.ptrTaskList[osCore.tasksCounter - 1];				// If the OS wasn't running load the first task to be run
+    	osCore.ptrCurrTask->taskExecStatus = OS_TASK_RUNNING;
     }
-    else
-    {
-    	index = osCore.ptrCurrTask->taskID;						// Computes next task id to be run
 
-    	// Check if this is the last task to be run. If so, reset index for next scheduler execution
-        if(index == osCore.tasksCounter)
-        	index = 0;
+	row = 0;
+	do
+	{
+		col = 0;
+		do
+		{
+			id = osCore.taskPriorityTable[row][col];
+			col++;
+		}
+		while( (osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED) &&
+				(osCore.taskPriorityTable[row][col] != 0) );
+		row++;
+	}
+	while( osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED );
 
-        osCore.ptrNextTask = osCore.ptrTaskList[index];			// Load next task to be run
-    }
+	if(osCore.ptrCurrTask->taskPriority == osCore.ptrTaskList[id - 1]->taskPriority )
+	{
+		col--;
+		row--;
+		do
+		{
+			id = osCore.taskPriorityTable[row][col];
+			col++;
+		}
+		while(osCore.ptrTaskList[id - 1]->taskExecStatus != OS_TASK_RUNNING);
+
+		do
+		{
+			if(osCore.taskPriorityTable[row][col] == 0)
+				col = 0;
+
+			id = osCore.taskPriorityTable[row][col];
+			col++;
+		}
+		while(osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED);
+
+	}
+
+	osCore.ptrNextTask = osCore.ptrTaskList[id - 1];			// Load next task to be run
+
 }
 
 /* ========== Processor Interruption and Exception Handlers ========= */
