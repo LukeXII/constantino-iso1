@@ -18,6 +18,7 @@ typedef struct{
     osTaskObject_t * ptrTaskList[OS_MAX_TASKS];   	// List of tasks
     uint8_t tasksCounter;
     uint8_t taskPriorityTable[4][OS_MAX_TASKS];
+    uint8_t runningTaskID;
 } osCoreCtrl_t;
 
 /* ================== Private variables declaration ================= */
@@ -137,7 +138,33 @@ void osStart(void)
 
 void osDelay(const uint32_t tick)
 {
-    //(void)tick;
+	/* Disable SysTick_IRQn so is not invocated in here */
+	NVIC_DisableIRQ(SysTick_IRQn);
+
+	/* We need to reschedule */
+	scheduler();
+
+	(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskDelay = tick;
+	(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskExecStatus = OS_TASK_BLOCKED;
+
+	/*
+     * Set up bit corresponding exception PendSV
+     */
+    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+
+    /*
+     * Instruction Synchronization Barrier; flushes the pipeline and ensures that
+     * all previous instructions are completed before executing new instructions
+     */
+    __ISB();
+    /*
+     * Data Synchronization Barrier; ensures that all memory accesses are
+     * completed before next instruction is executed
+     */
+    __DSB();
+	/* Enable SysTick_IRQn again */
+    NVIC_EnableIRQ(SysTick_IRQn);
+
 }
 
 WEAK void osReturnTaskHook(void)
@@ -181,19 +208,23 @@ static uint32_t getNextContext(uint32_t currentStackPointer)
     {
         // Storage last stack pointer used on current task and change state to ready
         osCore.ptrCurrTask->taskStackPointer = currentStackPointer;
-        osCore.ptrCurrTask->taskExecStatus = OS_TASK_READY;
+
+        if(osCore.ptrCurrTask->taskExecStatus == OS_TASK_RUNNING)
+        	osCore.ptrCurrTask->taskExecStatus = OS_TASK_READY;
 
         // Switch address memory points on current task for next task and change state of task
         osCore.ptrCurrTask = osCore.ptrNextTask;
         osCore.ptrCurrTask->taskExecStatus = OS_TASK_RUNNING;
     }
 
+    osCore.runningTaskID = osCore.ptrCurrTask->taskID;
+
     return osCore.ptrCurrTask->taskStackPointer;
 }
 
 static void scheduler(void)
 {
-	uint8_t row, col, id;
+	uint8_t row, col, id = 0;
 
     // Check if this is the first scheduler execution
     if (osCore.execStatus != OS_STATUS_RUNNING)
@@ -202,20 +233,25 @@ static void scheduler(void)
     	osCore.ptrCurrTask->taskExecStatus = OS_TASK_RUNNING;
     }
 
+    // Recorriendo desde coordenada 0,0 de la prioridad mas alta, busca la primera tarea en estado READY
 	row = 0;
 	do
 	{
-		col = 0;
-		do
+		if(osCore.taskPriorityTable[row][0] != 0)
 		{
-			id = osCore.taskPriorityTable[row][col];
-			col++;
+			col = 0;
+			do
+			{
+				id = osCore.taskPriorityTable[row][col];
+				col++;
+			}
+			while( (osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED) &&
+					(osCore.taskPriorityTable[row][col] != 0) );
 		}
-		while( (osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED) &&
-				(osCore.taskPriorityTable[row][col] != 0) );
 		row++;
 	}
-	while( osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED );
+	while( osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED ||
+			id == 0 );
 
 	if(osCore.ptrCurrTask->taskPriority == osCore.ptrTaskList[id - 1]->taskPriority )
 	{
@@ -248,8 +284,24 @@ static void scheduler(void)
 
 void SysTick_Handler(void)
 {
+	uint8_t id;
+
     scheduler();
     osSysTickHook();
+
+    for(id = 1;id <= osCore.tasksCounter;id++)
+    {
+    	if(osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED)
+    	{
+    		(osCore.ptrTaskList[id - 1]->taskDelay)--;
+
+    		if(osCore.ptrTaskList[id - 1]->taskDelay == 0)
+    			osCore.ptrTaskList[id - 1]->taskExecStatus = OS_TASK_READY;
+    	}
+
+    }
+
+
 
     /*
      * Set up bit corresponding exception PendSV

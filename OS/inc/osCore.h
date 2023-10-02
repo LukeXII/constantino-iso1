@@ -93,6 +93,7 @@ typedef struct
     uint8_t taskID;                             	// Task ID
     char * ptrTaskName[OS_MAX_TASK_NAME_CHAR];  	// Task name (for debug purposes)
     osTaskPriority_t taskPriority;					// Task assigned priority
+    uint32_t taskDelay;
 } osTaskObject_t;
 
 /* ************************************************************************* */
