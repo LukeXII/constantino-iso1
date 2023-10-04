@@ -1,0 +1,44 @@
+/*
+ * osSemaphore.h
+ *
+ *  Created on: Oct 3, 2023
+ *      Author: Lucas
+ */
+
+#ifndef INC_OSSEMAPHORE_H_
+#define INC_OSSEMAPHORE_H_
+
+#include <stdint.h>
+#include <stdbool.h>
+
+typedef struct
+{
+
+} osSemaphore_t;
+
+/**
+ * @brief Initializes semaphore binary or not.
+ *
+ * @param[in,out]   semaphore   Semaphore handler.
+ * @param[in]       maxCount    Maximum count value that can be reached.
+ * @param[in]       count       The count value assigned to the semaphore when it is created.
+ */
+void osSemaphoreInit(osSemaphore_t * semaphore, const uint32_t maxCount, const uint32_t count);
+
+/**
+ * @brief Take semaphore.
+ *
+ * @param[in,out]   semaphore   Semaphore handler.
+ *
+ * @return Returns true if the semaphore could be taken.
+ */
+bool osSemaphoreTake(osSemaphore_t * semaphore);
+
+/**
+ * @brief Give semaphore.
+ *
+ * @param[in,out]   semaphore   Semaphore handler.
+ */
+void osSemaphoreGive(osSemaphore_t * semaphore);
+
+#endif /* INC_OSSEMAPHORE_H_ */

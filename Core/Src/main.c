@@ -20,6 +20,8 @@
 #include "main.h"
 #include "string.h"
 #include "osCore.h"
+#include "osQueue.h"
+#include "osSemaphore.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -72,6 +74,8 @@ void osTask3(void);
 void osTask4(void);
 void osTask5(void);
 void osTask6(void);
+
+osQueueObject testQueue;
 /* USER CODE END 0 */
 
 /**
@@ -112,6 +116,8 @@ int main(void)
   osTaskCreate(&task4, TASK_PRIORITY_1, osTask4);
 //  osTaskCreate(&task5, TASK_PRIORITY_1, osTask5);
 //  osTaskCreate(&task6, TASK_PRIORITY_2, osTask6);
+
+  osQueueInit(&testQueue, sizeof(uint8_t));
 
   osStart();
 

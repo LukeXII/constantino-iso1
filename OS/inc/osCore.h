@@ -102,12 +102,15 @@ typedef struct
 
 osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, osTaskPriority_t taskPriority, void * ptrTaskCallback);
 void osStart(void);
+osTaskObject_t * osGetCurrentTask(void);
+
 /**
  * @brief Execute a delay for the current task.
  *
  * @param[in]   tick Number ticks delayed.
  */
 void osDelay(const uint32_t tick);
+void osRemoveDelay(osTaskObject_t * task);
 /**
  * @brief Function used as default when some task return for a problem.
  */

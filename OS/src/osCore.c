@@ -136,6 +136,11 @@ void osStart(void)
     NVIC_EnableIRQ(SysTick_IRQn);
 }
 
+osTaskObject_t * osGetCurrentTask(void)
+{
+	return osCore.ptrCurrTask;
+}
+
 void osDelay(const uint32_t tick)
 {
 	/* Disable SysTick_IRQn so is not invocated in here */
@@ -146,6 +151,40 @@ void osDelay(const uint32_t tick)
 
 	(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskDelay = tick;
 	(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskExecStatus = OS_TASK_BLOCKED;
+
+	/*
+     * Set up bit corresponding exception PendSV
+     */
+    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+
+    /*
+     * Instruction Synchronization Barrier; flushes the pipeline and ensures that
+     * all previous instructions are completed before executing new instructions
+     */
+    __ISB();
+    /*
+     * Data Synchronization Barrier; ensures that all memory accesses are
+     * completed before next instruction is executed
+     */
+    __DSB();
+	/* Enable SysTick_IRQn again */
+    NVIC_EnableIRQ(SysTick_IRQn);
+
+}
+
+void osRemoveDelay(osTaskObject_t * task)
+{
+	/* Disable SysTick_IRQn so is not invocated in here */
+	NVIC_DisableIRQ(SysTick_IRQn);
+
+	if(task->taskExecStatus == OS_TASK_BLOCKED)
+	{
+		task->taskDelay = 0;
+		task->taskExecStatus = OS_TASK_READY;
+
+		/* We need to reschedule */
+		scheduler();
+	}
 
 	/*
      * Set up bit corresponding exception PendSV
@@ -289,6 +328,7 @@ void SysTick_Handler(void)
     scheduler();
     osSysTickHook();
 
+    // esto no tendria que ir antes de llamar al scheduler?
     for(id = 1;id <= osCore.tasksCounter;id++)
     {
     	if(osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED)

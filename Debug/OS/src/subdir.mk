@@ -5,13 +5,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../OS/src/osCore.c 
+../OS/src/osCore.c \
+../OS/src/osQueue.c \
+../OS/src/osSemaphore.c 
 
 OBJS += \
-./OS/src/osCore.o 
+./OS/src/osCore.o \
+./OS/src/osQueue.o \
+./OS/src/osSemaphore.o 
 
 C_DEPS += \
-./OS/src/osCore.d 
+./OS/src/osCore.d \
+./OS/src/osQueue.d \
+./OS/src/osSemaphore.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -21,7 +27,7 @@ OS/src/%.o OS/src/%.su OS/src/%.cyclo: ../OS/src/%.c OS/src/subdir.mk
 clean: clean-OS-2f-src
 
 clean-OS-2f-src:
-	-$(RM) ./OS/src/osCore.cyclo ./OS/src/osCore.d ./OS/src/osCore.o ./OS/src/osCore.su
+	-$(RM) ./OS/src/osCore.cyclo ./OS/src/osCore.d ./OS/src/osCore.o ./OS/src/osCore.su ./OS/src/osQueue.cyclo ./OS/src/osQueue.d ./OS/src/osQueue.o ./OS/src/osQueue.su ./OS/src/osSemaphore.cyclo ./OS/src/osSemaphore.d ./OS/src/osSemaphore.o ./OS/src/osSemaphore.su
 
 .PHONY: clean-OS-2f-src
 

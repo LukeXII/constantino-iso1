@@ -1,0 +1,3 @@
+../OS/src/osSemaphore.c:10:6:osSemaphoreInit	1
+../OS/src/osSemaphore.c:15:6:osSemaphoreTake	1
+../OS/src/osSemaphore.c:20:6:osSemaphoreGive	1
