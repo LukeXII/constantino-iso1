@@ -47,12 +47,12 @@
 
 UART_HandleTypeDef huart3;
 
-osTaskObject_t task1;
-osTaskObject_t task2;
-osTaskObject_t task3;
-osTaskObject_t task4;
-osTaskObject_t task5;
-osTaskObject_t task6;
+osTaskObject task1;
+osTaskObject task2;
+osTaskObject task3;
+osTaskObject task4;
+osTaskObject task5;
+osTaskObject task6;
 
 /* USER CODE BEGIN PV */
 
@@ -110,14 +110,14 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
-  osTaskCreate(&task1, TASK_PRIORITY_3, osTask1);
-  osTaskCreate(&task2, TASK_PRIORITY_3, osTask2);
-  osTaskCreate(&task3, TASK_PRIORITY_1, osTask3);
-  osTaskCreate(&task4, TASK_PRIORITY_1, osTask4);
+  osTaskCreate(&task1, TASK_PRIORITY_0, osTask1);
+  osTaskCreate(&task2, TASK_PRIORITY_0, osTask2);
+  osTaskCreate(&task3, TASK_PRIORITY_0, osTask3);
+//  osTaskCreate(&task4, TASK_PRIORITY_1, osTask4);
 //  osTaskCreate(&task5, TASK_PRIORITY_1, osTask5);
 //  osTaskCreate(&task6, TASK_PRIORITY_2, osTask6);
 
-  osQueueInit(&testQueue, sizeof(uint8_t));
+  osQueueInit(&testQueue, sizeof(uint32_t));
 
   osStart();
 
@@ -137,6 +137,16 @@ int main(void)
 void osTask1(void)
 {
   uint32_t i = 0;
+  uint32_t a = 25;
+
+  osQueueSend(&testQueue, &a, 5);
+  a++;
+  osQueueSend(&testQueue, &a, 5);
+  a++;
+  osQueueSend(&testQueue, &a, 5);
+  a++;
+  osQueueSend(&testQueue, &a, 5);
+
   while(1)
   {
     i++;
@@ -147,16 +157,24 @@ void osTask1(void)
 void osTask2(void)
 {
   uint32_t j = 0;
+
+
   while(1)
   {
     j++;
-    osDelay(3);
+//    osDelay(3);
   }
 }
 
 void osTask3(void)
 {
   uint32_t k = 0;
+  uint32_t a = 2;
+  uint32_t b = 2;
+
+  osQueueReceive(&testQueue, &a, 5);
+  osQueueReceive(&testQueue, &b, 5);
+
   while(1)
   {
     k++;

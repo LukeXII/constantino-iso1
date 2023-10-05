@@ -72,7 +72,7 @@ typedef enum
     OS_TASK_RUNNING,
     OS_TASK_BLOCKED,
     OS_TASK_SUSPENDED
-} osTaskStatus_t;
+} osTaskStatusType;
 
 // Task priorities
 typedef enum
@@ -81,7 +81,7 @@ typedef enum
 	TASK_PRIORITY_1,
 	TASK_PRIORITY_2,
 	TASK_PRIORITY_3
-} osTaskPriority_t;
+} osPriorityType;
 
 // Task control structure
 typedef struct
@@ -89,20 +89,20 @@ typedef struct
     uint32_t taskStack[OS_MAX_STACK_SIZE/4];    	// Memory Size
     uint32_t taskStackPointer;                   	// Store the task SP
     void * ptrTaskEntryPoint;                   	// Task entry point address
-    osTaskStatus_t taskExecStatus;   				// Task current execution status
+    osTaskStatusType taskExecStatus;   				// Task current execution status
     uint8_t taskID;                             	// Task ID
     char * ptrTaskName[OS_MAX_TASK_NAME_CHAR];  	// Task name (for debug purposes)
-    osTaskPriority_t taskPriority;					// Task assigned priority
+    osPriorityType taskPriority;					// Task assigned priority
     uint32_t taskDelay;
-} osTaskObject_t;
+} osTaskObject;
 
 /* ************************************************************************* */
 /*                              Public Functions                             */
 /* ************************************************************************* */
 
-osError_t osTaskCreate(osTaskObject_t * ptrTaskHandler, osTaskPriority_t taskPriority, void * ptrTaskCallback);
+osError_t osTaskCreate(osTaskObject * ptrTaskHandler, osPriorityType taskPriority, void * ptrTaskCallback);
 void osStart(void);
-osTaskObject_t * osGetCurrentTask(void);
+osTaskObject * osGetCurrentTask(void);
 
 /**
  * @brief Execute a delay for the current task.
@@ -110,7 +110,7 @@ osTaskObject_t * osGetCurrentTask(void);
  * @param[in]   tick Number ticks delayed.
  */
 void osDelay(const uint32_t tick);
-void osRemoveDelay(osTaskObject_t * task);
+void osRemoveDelay(osTaskObject * task);
 /**
  * @brief Function used as default when some task return for a problem.
  */

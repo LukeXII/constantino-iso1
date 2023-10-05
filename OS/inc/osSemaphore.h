@@ -14,7 +14,7 @@
 typedef struct
 {
 
-} osSemaphore_t;
+} osSemaphoreObject;
 
 /**
  * @brief Initializes semaphore binary or not.
@@ -23,7 +23,7 @@ typedef struct
  * @param[in]       maxCount    Maximum count value that can be reached.
  * @param[in]       count       The count value assigned to the semaphore when it is created.
  */
-void osSemaphoreInit(osSemaphore_t * semaphore, const uint32_t maxCount, const uint32_t count);
+void osSemaphoreInit(osSemaphoreObject * semaphore, const uint32_t maxCount, const uint32_t count);
 
 /**
  * @brief Take semaphore.
@@ -32,13 +32,13 @@ void osSemaphoreInit(osSemaphore_t * semaphore, const uint32_t maxCount, const u
  *
  * @return Returns true if the semaphore could be taken.
  */
-bool osSemaphoreTake(osSemaphore_t * semaphore);
+bool osSemaphoreTake(osSemaphoreObject * semaphore);
 
 /**
  * @brief Give semaphore.
  *
  * @param[in,out]   semaphore   Semaphore handler.
  */
-void osSemaphoreGive(osSemaphore_t * semaphore);
+void osSemaphoreGive(osSemaphoreObject * semaphore);
 
 #endif /* INC_OSSEMAPHORE_H_ */

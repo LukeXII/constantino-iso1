@@ -7,17 +7,17 @@
 
 #include "osSemaphore.h"
 
-void osSemaphoreInit(osSemaphore_t * semaphore, const uint32_t maxCount, const uint32_t count)
+void osSemaphoreInit(osSemaphoreObject * semaphore, const uint32_t maxCount, const uint32_t count)
 {
 
 }
 
-bool osSemaphoreTake(osSemaphore_t * semaphore)
+bool osSemaphoreTake(osSemaphoreObject * semaphore)
 {
 
 }
 
-void osSemaphoreGive(osSemaphore_t * semaphore)
+void osSemaphoreGive(osSemaphoreObject * semaphore)
 {
 
 }

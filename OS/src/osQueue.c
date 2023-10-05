@@ -94,12 +94,12 @@ bool osQueueReceive(osQueueObject * queue, void * buffer, const uint32_t timeout
 
 static void __pushItem(osQueueObject * queue, const void * item)
 {
-	memcpy(queue->qBuffer + (queue->qLength * queue->qItemSizeBytes) + 1, item, queue->qItemSizeBytes);
+	memcpy(queue->qBuffer + (queue->qLength * queue->qItemSizeBytes), item, queue->qItemSizeBytes);
 	queue->qLength++;
 }
 
 static void __pullItem(osQueueObject * queue, const void * item)
 {
-
 	queue->qLength--;
+	memcpy(item, queue->qBuffer + (queue->qLength * queue->qItemSizeBytes), queue->qItemSizeBytes);
 }

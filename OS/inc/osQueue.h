@@ -14,19 +14,17 @@
 #include <string.h>
 #include "osCore.h"
 
-#define MAX_SIZE_QUEUE  32	     	// Maximum buffer size of the queue
+#define MAX_SIZE_QUEUE  3	     	// Maximum buffer size of the queue
 
 /**
  * @brief Data structure queue.
  */
 typedef struct
 {
-    osTaskObject_t * qWaitingTask;	// Task waiting for this queue
+    osTaskObject * qWaitingTask;	// Task waiting for this queue
 	uint8_t qLength;
     uint8_t qItemSizeBytes;
     uint8_t * qBuffer;
-    uint8_t qHead;					// Indexes for start and end of queue
-    uint8_t qTail;
 } osQueueObject;
 
 /**
