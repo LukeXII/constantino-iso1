@@ -91,7 +91,6 @@ typedef struct
     void * ptrTaskEntryPoint;                   	// Task entry point address
     osTaskStatusType taskExecStatus;   				// Task current execution status
     uint8_t taskID;                             	// Task ID
-    char * ptrTaskName[OS_MAX_TASK_NAME_CHAR];  	// Task name (for debug purposes)
     osPriorityType taskPriority;					// Task assigned priority
     uint32_t taskDelay;
 } osTaskObject;

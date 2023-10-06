@@ -91,6 +91,7 @@ void osStart(void)
 
     osTaskCreate(&idleTask, TASK_PRIORITY_3, osIdleTask);
 
+    // Completa la tabla de tareas dividida por prioridades
     for(i = 0; i < osCore.tasksCounter;i++)
     {
     	switch(osCore.ptrTaskList[i]->taskPriority)
@@ -148,11 +149,11 @@ void osDelay(const uint32_t tick)
 		/* Disable SysTick_IRQn so is not invocated in here */
 		NVIC_DisableIRQ(SysTick_IRQn);
 
-		/* We need to reschedule */
-		scheduler();
-
 		(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskDelay = tick;
 		(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskExecStatus = OS_TASK_BLOCKED;
+
+		/* We need to reschedule */
+		scheduler();
 
 		/*
 		 * Set up bit corresponding exception PendSV
@@ -180,9 +181,9 @@ void osBlockTask(osTaskObject * task)
 	{
 		NVIC_DisableIRQ(SysTick_IRQn);
 
-		scheduler();
-
 		task->taskExecStatus = OS_TASK_BLOCKED;
+
+		scheduler();
 
 		SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 
@@ -199,9 +200,9 @@ void osUnblockTask(osTaskObject * task)
 	{
 		NVIC_DisableIRQ(SysTick_IRQn);
 
-		scheduler();
-
 		task->taskExecStatus = OS_TASK_READY;
+
+		scheduler();
 
 		SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 
@@ -214,19 +215,16 @@ void osUnblockTask(osTaskObject * task)
 
 void osRemoveDelay(osTaskObject * task)
 {
-	if(task != NULL)
+	if( (task != NULL) && (task->taskExecStatus == OS_TASK_BLOCKED) )
 	{
 		/* Disable SysTick_IRQn so is not invocated in here */
 		NVIC_DisableIRQ(SysTick_IRQn);
 
-		if(task->taskExecStatus == OS_TASK_BLOCKED)
-		{
-			task->taskDelay = 0;
-			task->taskExecStatus = OS_TASK_READY;
+		task->taskDelay = 0;
+		task->taskExecStatus = OS_TASK_READY;
 
-			/* We need to reschedule */
-			scheduler();
-		}
+		/* We need to reschedule */
+		scheduler();
 
 		/*
 		 * Set up bit corresponding exception PendSV
@@ -310,6 +308,7 @@ static void scheduler(void)
     // Check if this is the first scheduler execution
     if (osCore.execStatus != OS_STATUS_RUNNING)
     {
+    	// ejecuta la tarea idle una vez antes que el resto
     	osCore.ptrCurrTask = osCore.ptrTaskList[osCore.tasksCounter - 1];				// If the OS wasn't running load the first task to be run
     	osCore.ptrCurrTask->taskExecStatus = OS_TASK_RUNNING;
     }
@@ -340,10 +339,13 @@ static void scheduler(void)
 		row--;
 		do
 		{
+			if(osCore.taskPriorityTable[row][col] == 0)
+				col = 0;
+
 			id = osCore.taskPriorityTable[row][col];
 			col++;
 		}
-		while(osCore.ptrTaskList[id - 1]->taskExecStatus != OS_TASK_RUNNING);
+		while(osCore.runningTaskID != id);
 
 		do
 		{
@@ -367,9 +369,6 @@ void SysTick_Handler(void)
 {
 	uint8_t id;
 
-    scheduler();
-    osSysTickHook();
-
     for(id = 1;id <= osCore.tasksCounter;id++)
     {
     	if( (osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED) && (osCore.ptrTaskList[id - 1]->taskDelay > 0) )
@@ -382,7 +381,8 @@ void SysTick_Handler(void)
 
     }
 
-
+    scheduler();
+    osSysTickHook();
 
     /*
      * Set up bit corresponding exception PendSV
