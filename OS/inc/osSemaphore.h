@@ -10,10 +10,14 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include "osCore.h"
 
 typedef struct
 {
-
+	uint8_t count;
+	uint8_t maxCount;
+	osTaskObject * waitingTask;
 } osSemaphoreObject;
 
 /**

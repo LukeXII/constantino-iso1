@@ -20,8 +20,6 @@ bool osQueueInit(osQueueObject * queue, const uint32_t dataSize)
 		queue->qWaitingTask = NULL;
 		queue->qItemSizeBytes = dataSize;
 		queue->qBuffer = malloc(dataSize * MAX_SIZE_QUEUE);
-	    queue->qHead = 0;
-	    queue->qTail = 0;
 	    queueCreated = true;
 	}
 

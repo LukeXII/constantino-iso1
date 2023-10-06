@@ -111,6 +111,8 @@ osTaskObject * osGetCurrentTask(void);
  */
 void osDelay(const uint32_t tick);
 void osRemoveDelay(osTaskObject * task);
+void osBlockTask(osTaskObject * task);
+void osUnblockTask(osTaskObject * task);
 /**
  * @brief Function used as default when some task return for a problem.
  */

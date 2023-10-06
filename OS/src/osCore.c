@@ -174,6 +174,44 @@ void osDelay(const uint32_t tick)
 	}
 }
 
+void osBlockTask(osTaskObject * task)
+{
+	if(task != NULL)
+	{
+		NVIC_DisableIRQ(SysTick_IRQn);
+
+		scheduler();
+
+		task->taskExecStatus = OS_TASK_BLOCKED;
+
+		SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+
+		__ISB();
+		__DSB();
+
+		NVIC_EnableIRQ(SysTick_IRQn);
+	}
+}
+
+void osUnblockTask(osTaskObject * task)
+{
+	if(task != NULL)
+	{
+		NVIC_DisableIRQ(SysTick_IRQn);
+
+		scheduler();
+
+		task->taskExecStatus = OS_TASK_READY;
+
+		SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+
+		__ISB();
+		__DSB();
+
+		NVIC_EnableIRQ(SysTick_IRQn);
+	}
+}
+
 void osRemoveDelay(osTaskObject * task)
 {
 	if(task != NULL)
@@ -332,10 +370,9 @@ void SysTick_Handler(void)
     scheduler();
     osSysTickHook();
 
-    // esto no tendria que ir antes de llamar al scheduler?
     for(id = 1;id <= osCore.tasksCounter;id++)
     {
-    	if(osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED)
+    	if( (osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED) && (osCore.ptrTaskList[id - 1]->taskDelay > 0) )
     	{
     		(osCore.ptrTaskList[id - 1]->taskDelay)--;
 
