@@ -2,4 +2,4 @@
 ../OS/src/osQueue.c:29:6:osQueueSend	6
 ../OS/src/osQueue.c:61:6:osQueueReceive	6
 ../OS/src/osQueue.c:93:13:__pushItem	1
-../OS/src/osQueue.c:99:13:__pullItem	1
+../OS/src/osQueue.c:99:13:__pullItem	2

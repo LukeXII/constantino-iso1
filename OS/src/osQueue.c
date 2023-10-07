@@ -98,6 +98,12 @@ static void __pushItem(osQueueObject * queue, const void * item)
 
 static void __pullItem(osQueueObject * queue, const void * item)
 {
+	uint8_t i;
+
 	queue->qLength--;
-	memcpy(item, queue->qBuffer + (queue->qLength * queue->qItemSizeBytes), queue->qItemSizeBytes);
+	memcpy(item, queue->qBuffer, queue->qItemSizeBytes);
+
+	for(i = 0; i < queue->qLength ;i++)
+		memcpy(queue->qBuffer + (i * queue->qItemSizeBytes), queue->qBuffer + ((i+1) * queue->qItemSizeBytes), queue->qItemSizeBytes);
+
 }
