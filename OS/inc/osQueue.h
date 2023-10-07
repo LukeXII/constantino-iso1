@@ -61,4 +61,7 @@ bool osQueueSend(osQueueObject * queue, const void * data, const uint32_t timeou
  */
 bool osQueueReceive(osQueueObject * queue, void * buffer, const uint32_t timeout);
 
+void __pushItem(osQueueObject * queue, const void * item);
+void __pullItem(osQueueObject * queue, const void * item);
+
 #endif /* INC_OSQUEUE_H_ */

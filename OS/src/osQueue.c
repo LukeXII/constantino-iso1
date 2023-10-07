@@ -7,9 +7,6 @@
 
 #include "osQueue.h"
 
-static void __pushItem(osQueueObject * queue, const void * item);
-static void __pullItem(osQueueObject * queue, const void * item);
-
 bool osQueueInit(osQueueObject * queue, const uint32_t dataSize)
 {
 	bool queueCreated = false;
@@ -90,13 +87,13 @@ bool osQueueReceive(osQueueObject * queue, void * buffer, const uint32_t timeout
 	return itemPulled;
 }
 
-static void __pushItem(osQueueObject * queue, const void * item)
+void __pushItem(osQueueObject * queue, const void * item)
 {
 	memcpy(queue->qBuffer + (queue->qLength * queue->qItemSizeBytes), item, queue->qItemSizeBytes);
 	queue->qLength++;
 }
 
-static void __pullItem(osQueueObject * queue, const void * item)
+void __pullItem(osQueueObject * queue, const void * item)
 {
 	uint8_t i;
 

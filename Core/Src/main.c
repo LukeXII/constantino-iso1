@@ -111,7 +111,7 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
-//  osTaskCreate(&task1, TASK_PRIORITY_0, osTask1);
+  osTaskCreate(&task1, TASK_PRIORITY_0, osTask1);
   osTaskCreate(&task2, TASK_PRIORITY_0, osTask2);
   osTaskCreate(&task3, TASK_PRIORITY_0, osTask3);
   osTaskCreate(&task4, TASK_PRIORITY_0, osTask4);
@@ -119,7 +119,7 @@ int main(void)
 //  osTaskCreate(&task6, TASK_PRIORITY_2, osTask6);
 
   osQueueInit(&testQueue, sizeof(uint32_t));
-  osSemaphoreInit(&testSemaphore, 1, 0);
+  osSemaphoreInit(&testSemaphore, 3, 0);
 
   osStart();
 
@@ -156,15 +156,10 @@ void osTask2(void)
   uint32_t j = 0;
   uint32_t a = 25;
 
+  osSemaphoreTake(&testSemaphore);
 //  osDelay(5);
 
-//  osSemaphoreGive(&testSemaphore);
-
-  osQueueSend(&testQueue, &a, 5);
-  a += 2;
-  osQueueSend(&testQueue, &a, 5);
-  a += 2;
-  osQueueSend(&testQueue, &a, 5);
+//  osQueueReceive(&testQueue, &a, 5);
 
   while(1)
   {
@@ -179,14 +174,7 @@ void osTask3(void)
   uint32_t b = 2;
   uint32_t c = 2;
 
-  osQueueReceive(&testQueue, &a, 5);
-  osQueueReceive(&testQueue, &b, 5);
-
-  a = 3;
-  osQueueSend(&testQueue, &a, 5);
-  a = 8;
-  osQueueSend(&testQueue, &a, 5);
-
+  osSemaphoreGive(&testSemaphore);
 
   while(1)
   {
@@ -197,9 +185,11 @@ void osTask3(void)
 void osTask4(void)
 {
   uint32_t k = 0;
-  uint32_t c = 2;
+  uint32_t a = 2;
 
-  osQueueReceive(&testQueue, &c, 5);
+  osDelay(2);
+
+  osSemaphoreGive(&testSemaphore);
 
   while(1)
   {

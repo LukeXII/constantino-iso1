@@ -50,3 +50,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+Debug/Core/Src/main.cyclo
+Debug/myOS.list

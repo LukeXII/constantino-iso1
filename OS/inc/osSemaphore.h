@@ -12,12 +12,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "osCore.h"
+#include "osQueue.h"
 
 typedef struct
 {
 	uint8_t count;
 	uint8_t maxCount;
-	osTaskObject * waitingTask;
+	osQueueObject waitingTask;
 } osSemaphoreObject;
 
 /**
