@@ -19,6 +19,7 @@ typedef struct{
     uint8_t tasksCounter;
     uint8_t taskPriorityTable[4][OS_MAX_TASKS];
     uint8_t runningTaskID;
+    uint8_t requestedSchedulingISR;
 } osKernelObject;
 
 /* ================== Private variables declaration ================= */
@@ -85,6 +86,7 @@ void osStart(void)
     NVIC_DisableIRQ(SysTick_IRQn);
     NVIC_DisableIRQ(PendSV_IRQn);
 
+    osCore.requestedSchedulingISR = 0;
     osCore.execStatus = OS_STATUS_RESET;		// Set the system to RESET for the first time
     osCore.ptrCurrTask = NULL;      			// Set the current task to NULL the first time
     osCore.ptrNextTask = NULL;      			// Set the next task to NULL the first time
@@ -140,6 +142,46 @@ void osStart(void)
 osTaskObject * osGetCurrentTask(void)
 {
 	return osCore.ptrCurrTask;
+}
+
+osStatus_t osGetCurrentStatus(void)
+{
+	return osCore.execStatus;
+}
+
+void osUpdateStatus(osStatus_t status)
+{
+	osCore.execStatus = status;
+}
+
+void setReschedulingISR(void)
+{
+	osCore.requestedSchedulingISR = 1;
+}
+
+void clearReschedulingISR(void)
+{
+	osCore.requestedSchedulingISR = 0;
+}
+
+uint8_t getReschedulingISR(void)
+{
+	return osCore.requestedSchedulingISR;
+}
+
+
+void osReschedule(void)
+{
+	NVIC_DisableIRQ(SysTick_IRQn);
+
+	scheduler();
+
+	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+
+	__ISB();
+	__DSB();
+
+	NVIC_EnableIRQ(SysTick_IRQn);
 }
 
 void osDelay(const uint32_t tick)

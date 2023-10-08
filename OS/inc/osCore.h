@@ -62,7 +62,8 @@ typedef enum
 typedef enum
 {
     OS_STATUS_RUNNING,
-    OS_STATUS_RESET
+    OS_STATUS_RESET,
+	OS_STATUS_IRQ
 } osStatus_t;
 
 // Task status
@@ -102,7 +103,8 @@ typedef struct
 osError_t osTaskCreate(osTaskObject * ptrTaskHandler, osPriorityType taskPriority, void * ptrTaskCallback);
 void osStart(void);
 osTaskObject * osGetCurrentTask(void);
-
+osStatus_t osGetCurrentStatus(void);
+void osUpdateStatus(osStatus_t status);
 /**
  * @brief Execute a delay for the current task.
  *
@@ -112,6 +114,10 @@ void osDelay(const uint32_t tick);
 void osRemoveDelay(osTaskObject * task);
 void osBlockTask(osTaskObject * task);
 void osUnblockTask(osTaskObject * task);
+void setReschedulingISR(void);
+void clearReschedulingISR(void);
+uint8_t getReschedulingISR(void);
+void osReschedule(void);
 /**
  * @brief Function used as default when some task return for a problem.
  */

@@ -22,6 +22,7 @@
 #include "osCore.h"
 #include "osQueue.h"
 #include "osSemaphore.h"
+#include "osIRQ.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -62,6 +63,7 @@ osTaskObject task6;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
+void myIRQFunction(void * data);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -77,6 +79,7 @@ void osTask6(void);
 
 osSemaphoreObject testSemaphore;
 osQueueObject testQueue;
+uint8_t irqData = 2;
 /* USER CODE END 0 */
 
 /**
@@ -121,6 +124,8 @@ int main(void)
   osQueueInit(&testQueue, sizeof(uint32_t));
   osSemaphoreInit(&testSemaphore, 3, 0);
 
+  osRegisterIRQ(EXTI0_IRQn, myIRQFunction, &irqData);
+
   osStart();
 
   /* USER CODE END 2 */
@@ -134,6 +139,11 @@ int main(void)
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
+}
+
+void myIRQFunction(void * data)
+{
+
 }
 
 void osTask1(void)

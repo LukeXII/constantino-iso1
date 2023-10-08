@@ -1,0 +1,5 @@
+../Drivers/CMSIS/Include/core_cm4.h:1688:22:__NVIC_EnableIRQ	2
+../Drivers/CMSIS/Include/core_cm4.h:1724:22:__NVIC_DisableIRQ	2
+../Drivers/CMSIS/Include/core_cm4.h:1777:22:__NVIC_ClearPendingIRQ	2
+../OS/src/osIRQ.c:11:6:osRegisterIRQ	4
+../OS/src/osIRQ.c:32:6:osUnregisterIRQ	2
