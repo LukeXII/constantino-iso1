@@ -288,6 +288,16 @@ void osRemoveDelay(osTaskObject * task)
 	}
 }
 
+void osEnterCriticalSection(void)
+{
+	__disable_irq();
+}
+
+void osExitCriticalSection(void)
+{
+	__enable_irq();
+}
+
 WEAK void osReturnTaskHook(void)
 {
     while(1)

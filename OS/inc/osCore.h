@@ -118,6 +118,17 @@ void setReschedulingISR(void);
 void clearReschedulingISR(void);
 uint8_t getReschedulingISR(void);
 void osReschedule(void);
+
+/**
+ * @brief Declare the beginning of the critical section
+ */
+void osEnterCriticalSection(void);
+
+/**
+ * @brief Declare the end of the critical section
+ */
+void osExitCriticalSection(void);
+
 /**
  * @brief Function used as default when some task return for a problem.
  */
