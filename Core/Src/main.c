@@ -116,15 +116,15 @@ int main(void)
 
   osTaskCreate(&task1, TASK_PRIORITY_0, osTask1);
   osTaskCreate(&task2, TASK_PRIORITY_0, osTask2);
-  osTaskCreate(&task3, TASK_PRIORITY_0, osTask3);
-  osTaskCreate(&task4, TASK_PRIORITY_0, osTask4);
+//  osTaskCreate(&task3, TASK_PRIORITY_0, osTask3);
+//  osTaskCreate(&task4, TASK_PRIORITY_0, osTask4);
 //  osTaskCreate(&task5, TASK_PRIORITY_1, osTask5);
 //  osTaskCreate(&task6, TASK_PRIORITY_2, osTask6);
 
   osQueueInit(&testQueue, sizeof(uint32_t));
   osSemaphoreInit(&testSemaphore, 3, 0);
 
-  osRegisterIRQ(EXTI0_IRQn, myIRQFunction, &irqData);
+  osRegisterIRQ(EXTI15_10_IRQn, myIRQFunction, &irqData);
 
   osStart();
 
@@ -143,7 +143,13 @@ int main(void)
 
 void myIRQFunction(void * data)
 {
+	HAL_GPIO_TogglePin(GPIOB, LD1_Pin);
 
+	task2.taskExecStatus = OS_TASK_READY;
+
+	setReschedulingISR();
+
+	__HAL_GPIO_EXTI_CLEAR_IT(USER_Btn_Pin);
 }
 
 void osTask1(void)
@@ -151,8 +157,9 @@ void osTask1(void)
   uint32_t i = 0;
   uint32_t a = 25;
 
+  task2.taskExecStatus = OS_TASK_BLOCKED;
 //  osDelay(2);
-  osSemaphoreTake(&testSemaphore);
+//  osSemaphoreTake(&testSemaphore);
 
   while(1)
   {
@@ -166,14 +173,17 @@ void osTask2(void)
   uint32_t j = 0;
   uint32_t a = 25;
 
-  osSemaphoreTake(&testSemaphore);
+//  osSemaphoreTake(&testSemaphore);
 //  osDelay(5);
 
 //  osQueueReceive(&testQueue, &a, 5);
 
   while(1)
   {
-    j++;
+
+	osDelay(200);
+	HAL_GPIO_TogglePin(GPIOB, LD2_Pin);
+	osDelay(200);
   }
 }
 
@@ -331,7 +341,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : USER_Btn_Pin */
   GPIO_InitStruct.Pin = USER_Btn_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD1_Pin LD3_Pin LD2_Pin */
@@ -353,6 +363,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

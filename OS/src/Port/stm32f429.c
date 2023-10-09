@@ -110,12 +110,12 @@ void osIRQHandler(osIRQnType irqType)
 	(irqVector[irqType].handler)(irqVector[irqType].data);
 	osUpdateStatus(prevState);
 
-	NVIC_ClearPendingIRQ(irqType);
-
 	if (getReschedulingISR())
 	{
 		clearReschedulingISR();
 		osReschedule();
 	}
+
+	NVIC_ClearPendingIRQ(irqType);
 }
 
