@@ -11,8 +11,8 @@
 /**
  * @note THe macros, types definition, variables and method of this file must be used internaly in the OS.
  */
+#include <osKernel.h>
 #include "stm32f429xx.h"
-#include "osCore.h"
 
 #define IRQ_NUMBER      91                  /* Number of interrupts supported by the MCU */
 

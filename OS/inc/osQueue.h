@@ -8,11 +8,11 @@
 #ifndef INC_OSQUEUE_H_
 #define INC_OSQUEUE_H_
 
+#include <osKernel.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include "osCore.h"
 
 #define MAX_SIZE_QUEUE  3	     	// Maximum buffer size of the queue
 

@@ -5,20 +5,20 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../OS/src/osCore.c \
 ../OS/src/osIRQ.c \
+../OS/src/osKernel.c \
 ../OS/src/osQueue.c \
 ../OS/src/osSemaphore.c 
 
 OBJS += \
-./OS/src/osCore.o \
 ./OS/src/osIRQ.o \
+./OS/src/osKernel.o \
 ./OS/src/osQueue.o \
 ./OS/src/osSemaphore.o 
 
 C_DEPS += \
-./OS/src/osCore.d \
 ./OS/src/osIRQ.d \
+./OS/src/osKernel.d \
 ./OS/src/osQueue.d \
 ./OS/src/osSemaphore.d 
 
@@ -30,7 +30,7 @@ OS/src/%.o OS/src/%.su OS/src/%.cyclo: ../OS/src/%.c OS/src/subdir.mk
 clean: clean-OS-2f-src
 
 clean-OS-2f-src:
-	-$(RM) ./OS/src/osCore.cyclo ./OS/src/osCore.d ./OS/src/osCore.o ./OS/src/osCore.su ./OS/src/osIRQ.cyclo ./OS/src/osIRQ.d ./OS/src/osIRQ.o ./OS/src/osIRQ.su ./OS/src/osQueue.cyclo ./OS/src/osQueue.d ./OS/src/osQueue.o ./OS/src/osQueue.su ./OS/src/osSemaphore.cyclo ./OS/src/osSemaphore.d ./OS/src/osSemaphore.o ./OS/src/osSemaphore.su
+	-$(RM) ./OS/src/osIRQ.cyclo ./OS/src/osIRQ.d ./OS/src/osIRQ.o ./OS/src/osIRQ.su ./OS/src/osKernel.cyclo ./OS/src/osKernel.d ./OS/src/osKernel.o ./OS/src/osKernel.su ./OS/src/osQueue.cyclo ./OS/src/osQueue.d ./OS/src/osQueue.o ./OS/src/osQueue.su ./OS/src/osSemaphore.cyclo ./OS/src/osSemaphore.d ./OS/src/osSemaphore.o ./OS/src/osSemaphore.su
 
 .PHONY: clean-OS-2f-src
 

@@ -8,10 +8,10 @@
 #ifndef INC_OSSEMAPHORE_H_
 #define INC_OSSEMAPHORE_H_
 
+#include <osKernel.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "osCore.h"
 #include "osQueue.h"
 
 typedef struct

@@ -17,9 +17,9 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <osKernel.h>
 #include "main.h"
 #include "string.h"
-#include "osCore.h"
 #include "osQueue.h"
 #include "osSemaphore.h"
 #include "osIRQ.h"
@@ -114,8 +114,8 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
-  osTaskCreate(&task1, TASK_PRIORITY_0, osTask1);
-  osTaskCreate(&task2, TASK_PRIORITY_0, osTask2);
+  osTaskCreate(&task1, OS_VERYHIGH_PRIORITY, osTask1);
+  osTaskCreate(&task2, OS_VERYHIGH_PRIORITY, osTask2);
 //  osTaskCreate(&task3, TASK_PRIORITY_0, osTask3);
 //  osTaskCreate(&task4, TASK_PRIORITY_0, osTask4);
 //  osTaskCreate(&task5, TASK_PRIORITY_1, osTask5);

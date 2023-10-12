@@ -5,8 +5,8 @@
  *      Author: Lucas
  */
 
-#ifndef INC_OSCORE_H_
-#define INC_OSCORE_H_
+#ifndef INC_OSKERNEL_H_
+#define INC_OSKERNEL_H_
 
 /* ************************************************************************* */
 /*                                  Includes                                 */
@@ -78,10 +78,10 @@ typedef enum
 // Task priorities
 typedef enum
 {
-    TASK_PRIORITY_0,
-	TASK_PRIORITY_1,
-	TASK_PRIORITY_2,
-	TASK_PRIORITY_3
+    OS_VERYHIGH_PRIORITY,
+    OS_HIGH_PRIORITY,
+    OS_NORMAL_PRIORITY,
+    OS_LOW_PRIORITY
 } osPriorityType;
 
 // Task control structure
@@ -157,4 +157,4 @@ WEAK void osErrorHook(void* caller);
  */
 WEAK void osIdleTask(void);
 
-#endif /* INC_OSCORE_H_ */
+#endif /* INC_OSKERNEL_H_ */

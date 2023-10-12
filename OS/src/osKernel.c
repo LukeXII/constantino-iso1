@@ -8,7 +8,7 @@
 /* ************************************************************************* */
 /*                                  Includes                                 */
 /* ************************************************************************* */
-#include "osCore.h"
+#include <osKernel.h>
 
 typedef struct{
 	osStatus_t execStatus;                			// OS execution status (Reset, Running, IRQ)
@@ -91,29 +91,29 @@ void osStart(void)
     osCore.ptrCurrTask = NULL;      			// Set the current task to NULL the first time
     osCore.ptrNextTask = NULL;      			// Set the next task to NULL the first time
 
-    osTaskCreate(&idleTask, TASK_PRIORITY_3, osIdleTask);
+    osTaskCreate(&idleTask, OS_LOW_PRIORITY, osIdleTask);
 
     // Completa la tabla de tareas dividida por prioridades
     for(i = 0; i < osCore.tasksCounter;i++)
     {
     	switch(osCore.ptrTaskList[i]->taskPriority)
     	{
-    	case TASK_PRIORITY_0:
+    	case OS_VERYHIGH_PRIORITY:
 
     		row = 0;
     		break;
 
-    	case TASK_PRIORITY_1:
+    	case OS_HIGH_PRIORITY:
 
     		row = 1;
     		break;
 
-    	case TASK_PRIORITY_2:
+    	case OS_NORMAL_PRIORITY:
 
     		row = 2;
     		break;
 
-    	case TASK_PRIORITY_3:
+    	case OS_LOW_PRIORITY:
 
     		row = 3;
     		break;
