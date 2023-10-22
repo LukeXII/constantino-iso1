@@ -11,7 +11,7 @@ void osSemaphoreInit(osSemaphoreObject * semaphore, const uint32_t maxCount, con
 {
 	osTaskObject task;
 
-	if( (semaphore != NULL) && (maxCount >= count) && (maxCount > 0) )
+	if( (semaphore != NULL) && (maxCount >= count) && (maxCount >= 0) )
 	{
 		semaphore->count = count;
 		semaphore->maxCount = maxCount;
@@ -20,17 +20,36 @@ void osSemaphoreInit(osSemaphoreObject * semaphore, const uint32_t maxCount, con
 	}
 }
 
-bool osSemaphoreTake(osSemaphoreObject * semaphore)
+void osSemaphoreGive(osSemaphoreObject * semaphore)
 {
 	osTaskObject * dummyTask;
-	bool ret = false;
 
 	if(semaphore != NULL)
 	{
-		if(semaphore->count > 0)
+		if((semaphore->waitingTask).qLength != 0)
 		{
-			semaphore->count--;
-			ret = true;
+			__pullItem(&(semaphore->waitingTask), &dummyTask);
+			osUnblockTask(dummyTask);
+		}
+		else
+		{
+			if(semaphore->count > 0)
+				semaphore->count--;
+		}
+	}
+}
+
+bool osSemaphoreTake(osSemaphoreObject * semaphore)
+{
+	osTaskObject * dummyTask;
+	bool semaphoreTaken = false;
+
+	if(semaphore != NULL)
+	{
+		if(semaphore->count < semaphore->maxCount)
+		{
+			semaphore->count++;
+			semaphoreTaken = true;
 		}
 		else
 		{
@@ -40,22 +59,5 @@ bool osSemaphoreTake(osSemaphoreObject * semaphore)
 		}
 	}
 
-	return ret;
-}
-
-void osSemaphoreGive(osSemaphoreObject * semaphore)
-{
-	osTaskObject * dummyTask;
-
-	if(semaphore != NULL)
-	{
-		if(semaphore->count < semaphore->maxCount)
-			semaphore->count++;
-
-		if((semaphore->waitingTask).qLength != 0)
-		{
-			__pullItem(&(semaphore->waitingTask), &dummyTask);
-			osUnblockTask(dummyTask);
-		}
-	}
+	return semaphoreTaken;
 }

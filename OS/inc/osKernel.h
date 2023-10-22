@@ -111,7 +111,6 @@ void osUpdateStatus(osStatus_t status);
  * @param[in]   tick Number ticks delayed.
  */
 void osDelay(const uint32_t tick);
-void osRemoveDelay(osTaskObject * task);
 void osBlockTask(osTaskObject * task);
 void osUnblockTask(osTaskObject * task);
 void setReschedulingISR(void);

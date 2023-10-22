@@ -33,7 +33,11 @@ bool osQueueSend(osQueueObject * queue, const void * data, const uint32_t timeou
 		if(queue->qLength == MAX_SIZE_QUEUE)
 		{
 			queue->qWaitingTask = osGetCurrentTask();
-			osDelay(timeout);
+
+			if(timeout == OS_MAX_DELAY)
+				osBlockTask(queue->qWaitingTask);
+			else
+				osDelay(timeout);
 
 			if(queue->qLength < MAX_SIZE_QUEUE)
 			{
@@ -48,7 +52,7 @@ bool osQueueSend(osQueueObject * queue, const void * data, const uint32_t timeou
 			itemPushed = true;
 			// Si habia una tarea esperando para pullear de una cola vacia, cancela el timeout
 			if( queue->qWaitingTask != NULL )
-				osRemoveDelay(queue->qWaitingTask);
+				osUnblockTask(queue->qWaitingTask);
 		}
 	}
 
@@ -65,7 +69,11 @@ bool osQueueReceive(osQueueObject * queue, void * buffer, const uint32_t timeout
 		if(queue->qLength == 0)
 		{
 			queue->qWaitingTask = osGetCurrentTask();
-			osDelay(timeout);
+
+			if(timeout == OS_MAX_DELAY)
+				osBlockTask(queue->qWaitingTask);
+			else
+				osDelay(timeout);
 
 			if(queue->qLength > 0)
 			{
@@ -80,7 +88,7 @@ bool osQueueReceive(osQueueObject * queue, void * buffer, const uint32_t timeout
 			itemPulled = true;
 			// Si habia una tarea esperando para pushear a una cola llena, cancela el timeout
 			if( queue->qWaitingTask != NULL )
-				osRemoveDelay(queue->qWaitingTask);
+				osUnblockTask(queue->qWaitingTask);
 		}
 	}
 

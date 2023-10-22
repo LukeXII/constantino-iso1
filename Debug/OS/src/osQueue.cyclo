@@ -1,5 +1,5 @@
 ../OS/src/osQueue.c:10:6:osQueueInit	3
-../OS/src/osQueue.c:26:6:osQueueSend	6
-../OS/src/osQueue.c:58:6:osQueueReceive	6
-../OS/src/osQueue.c:90:6:__pushItem	1
-../OS/src/osQueue.c:96:6:__pullItem	2
+../OS/src/osQueue.c:26:6:osQueueSend	7
+../OS/src/osQueue.c:62:6:osQueueReceive	7
+../OS/src/osQueue.c:98:6:__pushItem	1
+../OS/src/osQueue.c:104:6:__pullItem	2

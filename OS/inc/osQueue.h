@@ -14,7 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_SIZE_QUEUE  3	     	// Maximum buffer size of the queue
+#define MAX_SIZE_QUEUE  5	     	// Maximum buffer size of the queue
+#define OS_MAX_DELAY    0xFFFFFFFF  // Macro where the queue is locked forever. It ignores the timeout variable in the implementation
 
 /**
  * @brief Data structure queue.

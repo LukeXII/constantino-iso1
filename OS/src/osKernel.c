@@ -238,52 +238,20 @@ void osBlockTask(osTaskObject * task)
 
 void osUnblockTask(osTaskObject * task)
 {
-	if(task != NULL)
-	{
-		NVIC_DisableIRQ(SysTick_IRQn);
-
-		task->taskExecStatus = OS_TASK_READY;
-
-		scheduler();
-
-		SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-
-		__ISB();
-		__DSB();
-
-		NVIC_EnableIRQ(SysTick_IRQn);
-	}
-}
-
-void osRemoveDelay(osTaskObject * task)
-{
 	if( (task != NULL) && (task->taskExecStatus == OS_TASK_BLOCKED) )
 	{
-		/* Disable SysTick_IRQn so is not invocated in here */
 		NVIC_DisableIRQ(SysTick_IRQn);
 
 		task->taskDelay = 0;
 		task->taskExecStatus = OS_TASK_READY;
 
-		/* We need to reschedule */
 		scheduler();
 
-		/*
-		 * Set up bit corresponding exception PendSV
-		 */
 		SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 
-		/*
-		 * Instruction Synchronization Barrier; flushes the pipeline and ensures that
-		 * all previous instructions are completed before executing new instructions
-		 */
 		__ISB();
-		/*
-		 * Data Synchronization Barrier; ensures that all memory accesses are
-		 * completed before next instruction is executed
-		 */
 		__DSB();
-		/* Enable SysTick_IRQn again */
+
 		NVIC_EnableIRQ(SysTick_IRQn);
 	}
 }
