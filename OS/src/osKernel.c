@@ -172,27 +172,13 @@ uint8_t getReschedulingISR(void)
 
 void osReschedule(void)
 {
-	NVIC_DisableIRQ(SysTick_IRQn);
+	if(osCore.execStatus == OS_STATUS_IRQ)
+		setReschedulingISR();
 
-	scheduler();
-
-	SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-
-	__ISB();
-	__DSB();
-
-	NVIC_EnableIRQ(SysTick_IRQn);
-}
-
-void osDelay(const uint32_t tick)
-{
-	if(tick > 0)
+	if(osCore.execStatus == OS_STATUS_RUNNING)
 	{
 		/* Disable SysTick_IRQn so is not invocated in here */
 		NVIC_DisableIRQ(SysTick_IRQn);
-
-		(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskDelay = tick;
-		(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskExecStatus = OS_TASK_BLOCKED;
 
 		/* We need to reschedule */
 		scheduler();
@@ -217,42 +203,33 @@ void osDelay(const uint32_t tick)
 	}
 }
 
+void osDelay(const uint32_t tick)
+{
+	if(tick > 0)
+	{
+		(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskDelay = tick;
+		(osCore.ptrTaskList[osCore.runningTaskID - 1])->taskExecStatus = OS_TASK_BLOCKED;
+
+		osReschedule();
+	}
+}
+
 void osBlockTask(osTaskObject * task)
 {
 	if(task != NULL)
 	{
-		NVIC_DisableIRQ(SysTick_IRQn);
-
 		task->taskExecStatus = OS_TASK_BLOCKED;
 
-		scheduler();
-
-		SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-
-		__ISB();
-		__DSB();
-
-		NVIC_EnableIRQ(SysTick_IRQn);
+		osReschedule();
 	}
 }
 
 void osUnblockTask(osTaskObject * task)
 {
-	if( (task != NULL) && (task->taskExecStatus == OS_TASK_BLOCKED) )
+	if(task != NULL)
 	{
-		NVIC_DisableIRQ(SysTick_IRQn);
-
 		task->taskDelay = 0;
 		task->taskExecStatus = OS_TASK_READY;
-
-		scheduler();
-
-		SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-
-		__ISB();
-		__DSB();
-
-		NVIC_EnableIRQ(SysTick_IRQn);
 	}
 }
 
@@ -389,6 +366,7 @@ void SysTick_Handler(void)
 {
 	uint8_t id;
 
+	// Decrementa el tick de todas las tareas que tienen delay
     for(id = 1;id <= osCore.tasksCounter;id++)
     {
     	if( (osCore.ptrTaskList[id - 1]->taskExecStatus == OS_TASK_BLOCKED) && (osCore.ptrTaskList[id - 1]->taskDelay > 0) )

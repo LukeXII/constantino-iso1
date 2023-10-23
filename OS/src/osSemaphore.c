@@ -22,7 +22,7 @@ void osSemaphoreInit(osSemaphoreObject * semaphore, const uint32_t maxCount, con
 
 void osSemaphoreGive(osSemaphoreObject * semaphore)
 {
-	osTaskObject * dummyTask;
+	osTaskObject * dummyTask = NULL;
 
 	if(semaphore != NULL)
 	{
