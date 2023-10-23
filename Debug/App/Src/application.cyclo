@@ -1,0 +1,11 @@
+../App/Src/application.c:77:5:applicationStart	11
+../App/Src/application.c:179:14:itoa	6
+../App/Src/application.c:216:13:buildString2Send	1
+../App/Src/application.c:240:13:taskEvaluateCondition	10
+../App/Src/application.c:324:13:taskGreen	1
+../App/Src/application.c:341:13:taskRed	1
+../App/Src/application.c:358:13:taskYellow	1
+../App/Src/application.c:375:13:taskBlue	1
+../App/Src/application.c:392:13:taskLedHearbeat	1
+../App/Src/application.c:403:6:osSysTickHook	1
+../App/Src/application.c:411:6:teclasCallback	9

@@ -1,3 +1,7 @@
+"./App/Src/GPIOWrapper.o"
+"./App/Src/SerialWrapper.o"
+"./App/Src/application.o"
+"./App/Src/inithardware.o"
 "./Core/Src/main.o"
 "./Core/Src/stm32f4xx_hal_msp.o"
 "./Core/Src/stm32f4xx_hal_timebase_tim.o"

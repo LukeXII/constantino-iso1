@@ -2,7 +2,7 @@
 ../Drivers/CMSIS/Include/core_cm4.h:1724:22:__NVIC_DisableIRQ	2
 ../Drivers/CMSIS/Include/core_cm4.h:1816:22:__NVIC_SetPriority	2
 ../Drivers/CMSIS/Include/core_cm4.h:2022:26:SysTick_Config	2
-../OS/src/osKernel.c:36:11:osTaskCreate	5
+../OS/src/osKernel.c:36:6:osTaskCreate	5
 ../OS/src/osKernel.c:81:6:osStart	7
 ../OS/src/osKernel.c:142:16:osGetCurrentTask	1
 ../OS/src/osKernel.c:147:12:osGetCurrentStatus	1

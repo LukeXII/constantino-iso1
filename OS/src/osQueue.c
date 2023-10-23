@@ -6,6 +6,7 @@
  */
 
 #include "osQueue.h"
+#include <stdlib.h>
 
 bool osQueueInit(osQueueObject * queue, const uint32_t dataSize)
 {

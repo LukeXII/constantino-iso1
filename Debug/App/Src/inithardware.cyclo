@@ -1,0 +1,3 @@
+../App/Src/inithardware.c:13:6:InitHardware	1
+../App/Src/inithardware.c:27:13:MX_GPIO_Init	1
+../App/Src/inithardware.c:97:13:MX_USART3_UART_Init	2

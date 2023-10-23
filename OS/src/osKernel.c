@@ -33,19 +33,19 @@ static void scheduler(void);
 
 /* ================ Public functions implementation ================ */
 
-osError_t osTaskCreate(osTaskObject * ptrTaskHandler, osPriorityType taskPriority, void * ptrTaskCallback)
+bool osTaskCreate(osTaskObject * ptrTaskHandler, osPriorityType taskPriority, void * ptrTaskCallback)
 {
 
     // Check that arguments are not NULL
     if ( (ptrTaskHandler == NULL) || (ptrTaskCallback == NULL) )
     {
-    	return OS_ERR_INVALID_PTR;
+    	return false;
     }
 
     // Check if there's available tasks to allocate
     if (osCore.tasksCounter >= OS_MAX_TASKS)
     {
-        return OS_ERR_MAX_TASKS;
+        return false;
     }
 
     /*
@@ -74,7 +74,7 @@ osError_t osTaskCreate(osTaskObject * ptrTaskHandler, osPriorityType taskPriorit
     	osCore.ptrTaskList[osCore.tasksCounter] = NULL;
 	}
 
-    return OS_OK;
+    return true;
 }
 
 

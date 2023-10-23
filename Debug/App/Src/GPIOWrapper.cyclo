@@ -1,0 +1,2 @@
+../App/Src/GPIOWrapper.c:3:6:gpioSetLevel	1
+../App/Src/GPIOWrapper.c:9:6:gpioGetLevel	2

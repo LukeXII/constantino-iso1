@@ -11,7 +11,6 @@
 #include <osKernel.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include "osQueue.h"
 
 typedef struct

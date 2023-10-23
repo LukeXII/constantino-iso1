@@ -23,6 +23,10 @@
 #include "osQueue.h"
 #include "osSemaphore.h"
 #include "osIRQ.h"
+#include "application.h"
+#include "GPIOWrapper.h"
+#include "SerialWrapper.h"
+#include "inithardware.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -61,9 +65,6 @@ osTaskObject task6;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_USART3_UART_Init(void);
-void myIRQFunction(void * data);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -77,9 +78,7 @@ void osTask4(void);
 void osTask5(void);
 void osTask6(void);
 
-osSemaphoreObject testSemaphore;
-osQueueObject testQueue;
-uint8_t irqData = 2;
+
 /* USER CODE END 0 */
 
 /**
@@ -108,25 +107,21 @@ int main(void)
 
   /* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-//  MX_USART3_UART_Init();
-
   /* USER CODE BEGIN 2 */
 
-  osTaskCreate(&task1, OS_VERYHIGH_PRIORITY, osTask1);
-  osTaskCreate(&task2, OS_VERYHIGH_PRIORITY, osTask2);
+  /* Initialize all configured peripherals */
+
+  InitHardware();
+  applicationStart();
+
+//  osTaskCreate(&task1, OS_VERYHIGH_PRIORITY, osTask1);
+//  osTaskCreate(&task2, OS_VERYHIGH_PRIORITY, osTask2);
 //  osTaskCreate(&task3, TASK_PRIORITY_0, osTask3);
 //  osTaskCreate(&task4, TASK_PRIORITY_0, osTask4);
 //  osTaskCreate(&task5, TASK_PRIORITY_1, osTask5);
 //  osTaskCreate(&task6, TASK_PRIORITY_2, osTask6);
 
-  osQueueInit(&testQueue, sizeof(uint32_t));
-  osSemaphoreInit(&testSemaphore, 3, 0);
-
-  osRegisterIRQ(EXTI15_10_IRQn, myIRQFunction, &irqData);
-
-  osStart();
+//  osStart();
 
   /* USER CODE END 2 */
 
@@ -141,25 +136,12 @@ int main(void)
   /* USER CODE END 3 */
 }
 
-void myIRQFunction(void * data)
-{
-	HAL_GPIO_TogglePin(GPIOB, LD1_Pin);
-
-	task2.taskExecStatus = OS_TASK_READY;
-
-	setReschedulingISR();
-
-	__HAL_GPIO_EXTI_CLEAR_IT(USER_Btn_Pin);
-}
-
 void osTask1(void)
 {
   uint32_t i = 0;
-  uint32_t a = 25;
 
   task2.taskExecStatus = OS_TASK_BLOCKED;
-//  osDelay(2);
-//  osSemaphoreTake(&testSemaphore);
+
 
   while(1)
   {
@@ -170,13 +152,7 @@ void osTask1(void)
 
 void osTask2(void)
 {
-  uint32_t j = 0;
-  uint32_t a = 25;
 
-//  osSemaphoreTake(&testSemaphore);
-//  osDelay(5);
-
-//  osQueueReceive(&testQueue, &a, 5);
 
   while(1)
   {
@@ -190,11 +166,6 @@ void osTask2(void)
 void osTask3(void)
 {
   uint32_t k = 0;
-  uint32_t a = 2;
-  uint32_t b = 2;
-  uint32_t c = 2;
-
-  osSemaphoreGive(&testSemaphore);
 
   while(1)
   {
@@ -205,11 +176,6 @@ void osTask3(void)
 void osTask4(void)
 {
   uint32_t k = 0;
-  uint32_t a = 2;
-
-  osDelay(2);
-
-  osSemaphoreGive(&testSemaphore);
 
   while(1)
   {
@@ -280,97 +246,6 @@ void SystemClock_Config(void)
   }
 }
 
-/**
-  * @brief USART3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART3_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART3_Init 0 */
-
-  /* USER CODE END USART3_Init 0 */
-
-  /* USER CODE BEGIN USART3_Init 1 */
-
-  /* USER CODE END USART3_Init 1 */
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART3_Init 2 */
-
-  /* USER CODE END USART3_Init 2 */
-
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LD1_Pin|LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : USER_Btn_Pin */
-  GPIO_InitStruct.Pin = USER_Btn_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LD1_Pin LD3_Pin LD2_Pin */
-  GPIO_InitStruct.Pin = LD1_Pin|LD3_Pin|LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : USB_PowerSwitchOn_Pin */
-  GPIO_InitStruct.Pin = USB_PowerSwitchOn_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(USB_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : USB_OverCurrent_Pin */
-  GPIO_InitStruct.Pin = USB_OverCurrent_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(USB_OverCurrent_GPIO_Port, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
-
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
-}
 
 /* USER CODE BEGIN 4 */
 

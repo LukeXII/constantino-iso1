@@ -13,6 +13,7 @@
 /* ************************************************************************* */
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include "cmsis_gcc.h"
 #include "stm32f429xx.h"
 
@@ -100,7 +101,7 @@ typedef struct
 /*                              Public Functions                             */
 /* ************************************************************************* */
 
-osError_t osTaskCreate(osTaskObject * ptrTaskHandler, osPriorityType taskPriority, void * ptrTaskCallback);
+bool osTaskCreate(osTaskObject * ptrTaskHandler, osPriorityType taskPriority, void * ptrTaskCallback);
 void osStart(void);
 osTaskObject * osGetCurrentTask(void);
 osStatus_t osGetCurrentStatus(void);

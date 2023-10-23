@@ -5,23 +5,32 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../OS/src/Port/stm32f429.c 
+../App/Src/GPIOWrapper.c \
+../App/Src/SerialWrapper.c \
+../App/Src/application.c \
+../App/Src/inithardware.c 
 
 OBJS += \
-./OS/src/Port/stm32f429.o 
+./App/Src/GPIOWrapper.o \
+./App/Src/SerialWrapper.o \
+./App/Src/application.o \
+./App/Src/inithardware.o 
 
 C_DEPS += \
-./OS/src/Port/stm32f429.d 
+./App/Src/GPIOWrapper.d \
+./App/Src/SerialWrapper.d \
+./App/Src/application.d \
+./App/Src/inithardware.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-OS/src/Port/%.o OS/src/Port/%.su OS/src/Port/%.cyclo: ../OS/src/Port/%.c OS/src/Port/subdir.mk
+App/Src/%.o App/Src/%.su App/Src/%.cyclo: ../App/Src/%.c App/Src/subdir.mk
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F429xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -I"../OS/inc" -I../OS/inc/Port -I../App/Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 
-clean: clean-OS-2f-src-2f-Port
+clean: clean-App-2f-Src
 
-clean-OS-2f-src-2f-Port:
-	-$(RM) ./OS/src/Port/stm32f429.cyclo ./OS/src/Port/stm32f429.d ./OS/src/Port/stm32f429.o ./OS/src/Port/stm32f429.su
+clean-App-2f-Src:
+	-$(RM) ./App/Src/GPIOWrapper.cyclo ./App/Src/GPIOWrapper.d ./App/Src/GPIOWrapper.o ./App/Src/GPIOWrapper.su ./App/Src/SerialWrapper.cyclo ./App/Src/SerialWrapper.d ./App/Src/SerialWrapper.o ./App/Src/SerialWrapper.su ./App/Src/application.cyclo ./App/Src/application.d ./App/Src/application.o ./App/Src/application.su ./App/Src/inithardware.cyclo ./App/Src/inithardware.d ./App/Src/inithardware.o ./App/Src/inithardware.su
 
-.PHONY: clean-OS-2f-src-2f-Port
+.PHONY: clean-App-2f-Src
 

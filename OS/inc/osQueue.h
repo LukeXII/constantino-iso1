@@ -11,7 +11,6 @@
 #include <osKernel.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define MAX_SIZE_QUEUE  5	     	// Maximum buffer size of the queue
